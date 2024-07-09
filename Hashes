@@ -1,0 +1,25 @@
+const long long mod = 1e9 + 7;
+const long long P = 179;
+const long long nmax = 1e6 + 5;
+
+long long Pows[nmax];
+
+inline long long multi(long long a, long long b) { return a * b % mod; }
+inline long long add(long long a, long long b) { return (a + b >= mod ? a + b - mod : a + b); }
+inline long long sub(long long a, long long b) { return (a - b < 0 ? a - b + mod : a - b); }
+
+void getHash(string & s, std::vector<long long> & hashes, long long n) {
+    hashes.assign(n + 1, 0);
+    for (int i = 0; i < n; ++i) hashes[i + 1] = add(multi(hashes[i], P), (long long)s[i]);
+}
+
+long long query(std::vector<long long> & hashes, long long l, long long r) {
+    return sub(hashes[r], multi(hashes[l], Pows[r - l]));
+}
+
+signed main() {
+    std::cin.tie(0)->sync_with_stdio(0);
+    for (int i = 0; i < nmax; ++i) Pows[i] = (!i ? 1ll : multi(Pows[i - 1], P));
+    // something else ...
+    return 0;
+}
