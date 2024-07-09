@@ -1,0 +1,79 @@
+const long long inf = 1e18 + 1;
+
+struct Node {
+    long long minimum, push;
+    bool flag;
+    Node() {
+        minimum = push = 0;
+        flag = false;
+    }
+    Node(long long x) : minimum(x), push(0ll), flag(false) {}
+};
+
+struct SegmentTree {
+    long long size;
+    std::vector<Node> tree;
+    SegmentTree() {}
+    SegmentTree(long long sizeOfArray) {
+        size = sizeOfArray;
+        tree.resize(4 * sizeOfArray);
+    }
+    void build(long long v, long long l, long long r, std::vector<long long> & arr) {
+        if (l + 1 == r) {
+            tree[v].minimum = arr[l];
+            return;
+        }
+        long long mid = (l + r) >> 1;
+        build((v << 1) + 1, l, mid, arr);
+        build((v << 1) + 2, mid, r, arr);
+        tree[v].minimum = std::min(tree[(v << 1) + 1].minimum, tree[(v << 1) + 2].minimum);
+    }
+    void makePush(long long v) {
+        if (!tree[v].flag) return;
+        tree[v].flag = false;
+        tree[(v << 1) + 1].minimum = tree[(v << 1) + 1].push = tree[v].push;
+        tree[(v << 1) + 2].minimum = tree[(v << 1) + 2].push = tree[v].push;
+        tree[(v << 1) + 1].flag = tree[(v << 1) + 2].flag = true;
+        tree[v].push = 0;
+    }
+    void update(long long v, long long l, long long r, long long ql, long long qr, long long newValue) {
+        if (qr <= l || r <= ql) return;
+        if (ql <= l && r <= qr) {
+            tree[v].minimum = newValue;
+            tree[v].push = newValue;
+            tree[v].flag = true;
+            return;
+        }
+        makePush(v);
+        long long mid = (l + r) >> 1;
+        update((v << 1) + 1, l, mid, ql, qr, newValue);
+        update((v << 1) + 2, mid, r, ql, qr, newValue);
+        tree[v].minimum = std::min(tree[(v << 1) + 1].minimum, tree[(v << 1) + 2].minimum);
+    }
+    long long query(long long v, long long l, long long r, long long ql, long long qr) {
+        if (qr <= l || r <= ql) return inf;
+        if (ql <= l && r <= qr) return tree[v].minimum;
+        makePush(v);
+        long long mid = (l + r) >> 1;
+        return std::min(query((v << 1) + 1, l, mid, ql, qr), query((v << 1) + 2, mid, r, ql, qr));
+    }
+    void out(long long v, long long l, long long r) {
+        if (l + 1 == r) {
+            std::cout << tree[v].minimum << ' ';
+            return;
+        }
+        makePush(v);
+        long long mid = (l + r) >> 1;
+        out((v << 1) + 1, l, mid);
+        out((v << 1) + 2, mid, r);
+    }
+};
+
+signed main() {
+    std::cin.tie(0)->sync_with_stdio(0);
+    long long n;
+    std::cin >> n;
+    SegmentTree arr(n);
+    // something else ...
+    return 0;
+}
