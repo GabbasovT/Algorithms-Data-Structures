@@ -73,7 +73,7 @@ signed main() {
     std::cin.tie(0)->sync_with_stdio(0);
     long long n;
     std::cin >> n;
-    SegmentTree arr(n);
+    SegmentTree object(n);
     // something else ...
     return 0;
 }
