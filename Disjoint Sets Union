@@ -1,0 +1,32 @@
+struct DSU {
+    std::vector<long long> parents, rank;
+    DSU() {}
+    DSU(long long size) {
+        parents.resize(size);
+        iota(parents.begin(), parents.end(), 0ll);
+        rank.assign(size, 1ll);
+    }
+    long long getLeader(long long v) {
+        return parents[v] = (parents[v] == v ? v : getLeader(parents[v]));
+    }
+    void unite(long long u, long long v) {
+        u = getLeader(u);
+        v = getLeader(v);
+        if (u == v) return;
+        if (rank[u] < rank[v]) std::swap(u, v);
+        parents[v] = u;
+        rank[u] = std::max(rank[u], rank[v] + 1);
+    }
+    bool isTogether(long long u, long long v) {
+        return getLeader(u) == getLeader(v);
+    }
+};
+
+signed main() {
+    std::cin.tie(0)->sync_with_stdio(0);
+    long long n;
+    std::cin >> n;
+    DSU object(n);
+    // something else ...
+    return 0;
+}
