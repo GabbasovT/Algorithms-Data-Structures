@@ -1,0 +1,53 @@
+struct FenwickTree {
+    std::vector<long long> sizes;
+    std::vector<std::vector<long long>> tree, arr;
+    FenwickTree() {}
+    FenwickTree(std::vector<long long> sizesOfArray) {
+        sizes = sizesOfArray;
+        arr.assign(sizes[0] + 1, std::vector<long long>(sizes[1] + 1, 0ll));
+        tree.assign(sizes[0] + 1, std::vector<long long>(sizes[1] + 1, 0ll));
+    }
+    void build(std::vector<std::vector<long long>> & array) {
+        arr = array; // Please, be careful !!!
+        // Null row and column must be filled with zeros !!!
+        for (int it = 1; it <= sizes[0]; ++it) {
+            for (int jt = 1; jt <= sizes[1]; ++jt) {
+                for (int i = it; i <= sizes[0]; i += i & -i) {
+                    for (int j = jt; j < sizes[1]; j += j & -j) {
+                        tree[i][j] += arr[it][jt];
+                    }
+                }
+            }
+        }
+    }
+    void update(long long x, long long y, long long newValue) {
+        newValue -= arr[x][y];
+        for (int i = x; i <= sizes[0]; i += i & -i) {
+            for (int j = y; j < sizes[1]; j += j & -j) {
+                tree[i][j] += newValue;
+            }
+        }
+    }
+    long long prefQuery(long long x, long long y) {
+        long long sum = 0;
+        for (int i = x; i > 0; i -= i & -i) {
+            for (int j = y; j > 0; j -= j & -j) {
+                sum += tree[i][j];
+            }
+        }
+        return sum;
+    }
+    long long query(long long x, long long y, long long x2, long long y2) {
+        return prefQuery(x2, y2) + prefQuery(x - 1, y - 1)\
+         - prefQuery(x2, y - 1) - prefQuery(x - 1, y2);
+    }
+};
+
+signed main() {
+    std::cin.tie(0)->sync_with_stdio(0);
+    long long n, m;
+    std::cin >> n >> m;
+    FenwickTree object(std::vector<long long>{n, m});
+    // something else ...
+    return 0;
+}
