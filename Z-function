@@ -1,0 +1,18 @@
+std::vector<long long> zFunction(std::string & s) {
+    std::vector<long long> Z((int)s.size(), 0);
+    for (int i = 1, l = 0, r = 0; i < (int)s.size(); ++i) {
+        if (i <= r) Z[i] = std::min(Z[i - l], r - i + 1ll);
+        while (i + Z[i] < (int)s.size() && s[Z[i]] == s[Z[i] + i]) Z[i]++;
+        if (Z[i] + i - 1 > r) {
+            r = Z[i] + i - 1;
+            l = i;
+        }
+    }
+    return Z;
+}
+
+signed main() {
+    std::cin.tie(0)->sync_with_stdio(0);
+    // something else ...
+    return 0;
+}
