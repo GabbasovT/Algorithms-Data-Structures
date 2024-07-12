@@ -1,0 +1,15 @@
+std::vector<long long> prefFunction(std::string & s) {
+    std::vector<long long> pref((int)s.size(), 0);
+    for (int i = 1; i < (int)s.size(); ++i) {
+        long long cur = pref[i - 1];
+        while (s[cur] != s[i] && cur > 0) cur = pref[cur - 1];
+        pref[i] = (s[i] == s[cur] ? cur + 1 : cur);
+    }
+    return pref;
+}
+
+signed main() {
+    std::cin.tie(0)->sync_with_stdio(0);
+    // something else ...
+    return 0;
+}
