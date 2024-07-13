@@ -8,7 +8,7 @@ inline long long multi(long long a, long long b) { return a * b % mod; }
 inline long long add(long long a, long long b) { return (a + b >= mod ? a + b - mod : a + b); }
 inline long long sub(long long a, long long b) { return (a - b < 0 ? a - b + mod : a - b); }
 
-void getHash(string & s, std::vector<long long> & hashes, long long n) {
+void getHash(std::string & s, std::vector<long long> & hashes, long long n) {
     hashes.assign(n + 1, 0);
     for (int i = 0; i < n; ++i) hashes[i + 1] = add(multi(hashes[i], P), (long long)s[i]);
 }
