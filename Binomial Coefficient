@@ -1,0 +1,29 @@
+const long long nmax = 1e6 + 5;
+const long long mod = 1e9 + 7;
+
+long long factorials[nmax];
+
+inline long long add(long long a, long long b) { return (a + b >= mod ? a + b - mod : a + b); }
+inline long long sub(long long a, long long b) { return (a - b < 0 ? a - b + mod : a - b); }
+inline long long multi(long long a, long long b) { return a * b % mod; }
+
+long long binPow(long long a, long long pow) {
+    if (!pow) return 1ll;
+    if (pow & 1) return multi(a, binPow(a, pow - 1));
+    else {
+        long long buffer = binPow(a, pow >> 1);
+        return multi(buffer, buffer);
+    }
+}
+
+long long C(long long n, long long k) {
+    if (n < 0 || k < 0 || k > n) return 0ll;
+    return multi(factorials[n], binPow(multi(factorials[k], factorials[n - k]), mod - 2));
+}
+
+signed main() {
+    std::cin.tie(0)->sync_with_stdio(0);
+    for (long long i = 0; i < nmax; ++i) factorials[i] = (!i ? 1ll : multi(i, factorials[i - 1]));
+    // something else ...
+    return 0;
+}
