@@ -1,0 +1,24 @@
+std::vector<long long> dijkstrasAlgo(long long s, long long sizeOfGraph) {
+    std::vector<long long> distances(sizeOfGraph + 1, 1e18);
+    std::set<std::pair<long long, long long>> Q;
+    distances[s] = 0;
+    Q.insert({0, s});
+    while (!Q.empty()) {
+        long long vertex = Q.begin()->second;
+        Q.erase(Q.begin());
+        for (auto [u, weight] : graph[vertex]) {
+            if (distances[u] > distances[vertex] + weight) {
+                Q.erase({distances[u], u});
+                distances[u] = distances[vertex] + weight;
+                Q.insert({distances[u], u});
+            }
+        }
+    }
+    return distances;
+}
+
+signed main() {
+    std::cin.tie(0)->sync_with_stdio(0);
+    // something else ...
+    return 0;
+}
