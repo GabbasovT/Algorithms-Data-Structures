@@ -1,0 +1,48 @@
+template <typename T>
+struct Point {
+    T x, y;
+    Point() {}
+    Point(T _x, T _y) : x(_x), y(_y) {}
+    Point operator +(Point pt) {
+        return Point(x + pt.x, y + pt.y); 
+    }
+    Point operator -(Point pt) {
+        return Point(x - pt.x, y - pt.y); 
+    }
+    Point operator *(T value) {
+        return Point(value * x, value * y);
+    }
+    Point operator /(T value) {
+        return Point(x / value, y / value);
+    }
+    Point operator +=(Point pt) {
+        x += pt.x;
+        y += pt.y;
+        return *this;
+    }
+    Point operator -=(Point pt) {
+        x -= pt.x;
+        y -= pt.y;
+        return *this;
+    }
+    T operator *(Point pt) {
+        return x * pt.x + y * pt.y;
+    }
+    T operator %(Point pt) {
+        return x * pt.y - y * pt.x;
+    }
+    double lenVector() {
+        return hypot(x, y);
+    }
+    double dist(Point pt) {
+        return hypot(x - pt.x, y - pt.y);
+    }
+};
+
+signed main() {
+    std::cin.tie(0)->sync_with_stdio(0);
+    std::cout << std::setprecision(10) << std::fixed;
+    Point<double> object;
+    // something else ...
+    return 0;
+}
