@@ -1,0 +1,70 @@
+const long long nmax = 1e5 + 5;
+
+std::random_device rd;
+std::mt19937 gen(rd());
+
+struct Node {
+    long long prior, sz, value, sum;
+    Node * l, * r;
+    Node() { l = r = nullptr; }
+    Node(long long x) : prior((long long)gen()), sz(1ll), value(x), sum(x), l(nullptr), r(nullptr) {}
+};
+
+long long iter = 0;
+Node nodes[nmax];
+Node * newNode(long long x) {
+    nodes[iter] = Node(x);
+    return & nodes[iter++];
+}
+
+inline long long renewSum(Node * v) { return (v ? v->sum : 0ll); }
+inline long long renewSize(Node * v) { return (v ? v->sz : 0ll); }
+
+void update(Node * v) {
+    v->sum = v->value + renewSum(v->l) + renewSum(v->r);
+    v->sz = 1ll + renewSize(v->l) + renewSize(v->r);
+}
+
+Node * merge(Node * A, Node * B) {
+    if (!A) return B;
+    if (!B) return A;
+    if (A->prior > B->prior) {
+        A->r = merge(A->r, B);
+        update(A);
+        return A;
+    } else {
+        B->l = merge(A, B->l);
+        update(B);
+        return B;
+    }
+}
+
+std::pair<Node *, Node *> split(Node * v, long long k) {
+    if (!v) return std::make_pair(nullptr, nullptr);
+    if (renewSize(v->l) + 1 <= k) {
+        std::pair<Node *, Node *> X = split(v->r, k - 1 - renewSize(v->l)); 
+        v->r = X.first;
+        update(v);
+        return std::make_pair(v, X.second);
+    } else {
+        std::pair<Node *, Node *> X = split(v->l, k);
+        v->l = X.second;
+        update(v);
+        return std::make_pair(X.first, v);
+    }
+}
+
+void out(Node * v) {
+    if (!v) return;
+    out(v->l);
+    std::cout << v->value << ' ';
+    out(v->r);
+}
+
+Node * object = nullptr;
+
+signed main() {
+    std::cin.tie(0)->sync_with_stdio(0);
+    // something else ...
+    return 0;
+}
