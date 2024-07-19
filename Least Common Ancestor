@@ -1,0 +1,64 @@
+const long long nmax = 1e5 + 5;
+const long long logmax = 23;
+const long long inf = 1e18;
+
+long long levelAnc[logmax][nmax];
+long long minLA[logmax][nmax];
+long long depths[nmax];
+std::vector<std::pair<long long, long long>> g[nmax];
+
+void dfs(long long v, long long depth = 1, long long par = 0, long long costEdge = inf) {
+    depths[v] = depth;
+    levelAnc[0][v] = par;
+    minLA[0][v] = costEdge;
+    for (int pow = 1; pow < logmax; ++pow) {
+        levelAnc[pow][v] = levelAnc[pow - 1][levelAnc[pow - 1][v]];
+        minLA[pow][v] = std::min(minLA[pow - 1][v], minLA[pow - 1][levelAnc[pow - 1][v]]);
+    }
+    for (auto u : g[v]) if (u.first != par) dfs(u.first, depth + 1, v, u.second);
+}
+
+long long levelUp(long long v, long long k) {
+    for (int pow = 0; pow < logmax; ++pow) 
+        if ((1ll << pow) & k)
+            v = levelAnc[pow][v];
+    return v;
+}
+
+long long minOnPath(long long v, long long k) {
+    long long mn = inf;
+    for (int pow = 0; pow < logmax; ++pow) {
+        if ((1ll << pow) & k) {
+            mn = std::min(mn, minLA[pow][v]);
+            v = levelAnc[pow][v];
+        }
+    }
+    return mn;
+}
+
+long long LCA(long long u, long long v) {
+    if (depths[u] > depths[v]) std::swap(u, v);
+    long long delta = depths[v] - depths[u];
+    v = levelUp(v, delta);
+    if (u == v) return u;
+    for (int pow = logmax - 1; pow >= 0; --pow) {
+        if (levelAnc[pow][u] != levelAnc[pow][v]) {
+            u = levelAnc[pow][u];
+            v = levelAnc[pow][v];
+        }
+    }
+    return levelAnc[0][u];
+}
+
+long long query(long long u, long long v) {
+    long long lca = LCA(u, v);
+    return std::min(minOnPath(u, depths[u] - depths[lca]), minOnPath(v, depths[v] - depths[lca]));
+}
+
+signed main() {
+    std::cin.tie(0)->sync_with_stdio(0);
+    // input
+    dfs(1);
+    // something else ...
+    return 0;
+}
