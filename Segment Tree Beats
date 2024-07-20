@@ -1,0 +1,108 @@
+const long long nmax = 1e5 + 5;
+
+struct Node {
+  long long mn, mx, sum, psh, add;
+  Node() { psh = 1e18, add = 0; }
+  Node(long long val) : mn(val), mx(val), sum(val), psh(1e18), add(0) {}
+  void merge(Node & a, Node & b) {
+    mn = std::min(a.mn, b.mn);
+    mx = std::max(a.mx, b.mx);
+    sum = a.sum + b.sum;
+  }
+};
+
+Node t[4 * nmax];
+
+void build(long long v, long long l, long long r, std::vector<long long> & arr) {
+  if (l + 1 == r) {
+    t[v] = Node(arr[l]);
+    return;
+  }
+  long long mid = (l + r) >> 1;
+  build((v << 1) + 1, l, mid, arr);
+  build((v << 1) + 2, mid, r, arr);
+  t[v].merge(t[(v << 1) + 1], t[(v << 1) + 2]);
+}
+
+inline void mkpsh(long long v, long long l, long long r) {
+  if (t[v].psh == 1e18 && t[v].add == 0) return;
+  long long mid = (l + r) >> 1;
+  if (t[v].psh != 1e18) {
+    t[(v << 1) + 1].sum = (mid - l) * t[v].psh;
+    t[(v << 1) + 2].sum = (r - mid) * t[v].psh;
+    t[(v << 1) + 1].mx = t[v].psh;
+    t[(v << 1) + 1].mn = t[v].psh;
+    t[(v << 1) + 2].mx = t[v].psh;
+    t[(v << 1) + 2].mn = t[v].psh;
+    t[(v << 1) + 1].psh = t[v].psh;
+    t[(v << 1) + 2].psh = t[v].psh;
+    t[(v << 1) + 1].add = 0;
+    t[(v << 1) + 2].add = 0;
+    t[v].psh = 1e18;
+  } else if (t[v].add != 0) {
+    t[(v << 1) + 1].sum += (mid - l) * t[v].add;
+    t[(v << 1) + 1].mn += t[v].add;
+    t[(v << 1) + 1].mx += t[v].add;
+    t[(v << 1) + 2].sum += (r - mid) * t[v].add;
+    t[(v << 1) + 2].mn += t[v].add;
+    t[(v << 1) + 2].mx += t[v].add;
+    if (t[(v << 1) + 1].psh != 1e18)
+      t[(v << 1) + 1].psh += t[v].add;
+    else
+      t[(v << 1) + 1].add += t[v].add;
+    if (t[(v << 1) + 2].psh != 1e18)
+      t[(v << 1) + 2].psh += t[v].add;
+    else
+      t[(v << 1) + 2].add += t[v].add;
+    t[v].add = 0;
+  }
+}
+
+void inc(long long v, long long l, long long r, long long ql, long long qr, long long val) {
+  if (qr <= l || r <= ql) return;
+  if (ql <= l && r <= qr) {
+    t[v].sum += (r - l) * val;
+    t[v].mn += val;
+    t[v].mx += val;
+    if (t[v].psh != 1e18)
+      t[v].psh += val;
+    else
+      t[v].add += val;
+    return;
+  }
+  mkpsh(v, l, r);
+  long long mid = (l + r) >> 1;
+  inc((v << 1) + 1, l, mid, ql, qr, val);
+  inc((v << 1) + 2, mid, r, ql, qr, val);
+  t[v].merge(t[(v << 1) + 1], t[(v << 1) + 2]);
+}
+
+void minto(long long v, long long l, long long r, long long ql, long long qr, long long val) {
+  if (qr <= l || r <= ql || t[v].mx <= val) return;
+  if (ql <= l && r <= qr && t[v].mn >= val) {
+    t[v].sum = (r - l) * val;
+    t[v].mn = t[v].mx = val;
+    t[v].psh = val;
+    t[v].add = 0;
+    return;
+  }
+  mkpsh(v, l, r);
+  long long mid = (l + r) >> 1;
+  minto((v << 1) + 1, l, mid, ql, qr, val);
+  minto((v << 1) + 2, mid, r, ql, qr, val);
+  t[v].merge(t[(v << 1) + 1], t[(v << 1) + 2]);
+}
+
+long long get(long long v, long long l, long long r, long long ql, long long qr) {
+  if (qr <= l || r <= ql) return 0;
+  if (ql <= l && r <= qr) return t[v].sum;
+  mkpsh(v, l, r);
+  long long mid = (l + r) >> 1;
+  return get((v << 1) + 1, l, mid, ql, qr) + get((v << 1) + 2, mid, r, ql, qr);
+}
+
+signed main() {
+  std::cin.tie(0)->sync_with_stdio(0);
+  // something else ...
+  return 0;
+}
