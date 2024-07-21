@@ -1,0 +1,111 @@
+const long long nmax = 3e5 + 5;
+
+int timer = 1, n, q;
+int a[nmax], sz[nmax], t_in[nmax], head[nmax], dist[nmax];
+int seg[nmax], pref[nmax], parent[nmax];
+int t[4 * nmax];
+
+std::vector<int> g[nmax], times;
+
+void sizee(int v, int par = 1) {
+    sz[v] = 1;
+    parent[v] = par;
+    for (auto u : g[v]) {
+        if (u != par) {
+            sizee(u, v);
+            sz[v] += sz[u];
+        }
+    }
+}
+
+void dfs(int v, int d, int par = -1) {
+    int mx = 0, ind = 0;
+    dist[v] = d;
+    for (int i = 0; i < (int)g[v].size(); ++i) {
+        int u = g[v][i];
+        if (u != par) {
+            if (sz[u] > mx) {
+                mx = sz[u];
+                ind = i;
+            }
+            dfs(u, d + 1, v);
+        }
+    }
+  if (g[v].size()) std::swap(g[v][ind], g[v][0]);
+}
+
+void tin(int v, int par = -1) {
+    t_in[v] = timer++;
+    times.push_back(v);
+    for (auto u : g[v]) if (u != par) tin(u, v);
+}
+
+void search_head(int v, int header, int par = -1) {
+    head[v] = header;
+    for (int i = 0; i < (int)g[v].size(); ++i) {
+        int u = g[v][i];
+        if (u != par) {
+            if (i == 0) search_head(u, header, v);
+            else search_head(u, u, v);
+        }
+    }
+}
+
+void build(int v, int l, int r, std::vector<int>& arr) {
+    if (l + 1 == r) {
+        t[v] = arr[times[l] - 1];
+        return;
+    }
+    int mid = (l + r) >> 1;
+    build(2 * v + 1, l, mid, arr);
+    build(2 * v + 2, mid, r, arr);
+    t[v] = std::max(t[2 * v + 1], t[2 * v + 2]);
+}
+
+void update(int v, int l, int r, int pos, int val) {
+    if (l + 1 == r) {
+        t[v] = val;
+        return;
+    }
+    int mid = (l + r) >> 1;
+    if (pos < mid) update(2 * v + 1, l, mid, pos, val);
+    else update(2 * v + 2, mid, r, pos, val);
+    t[v] = std::max(t[2 * v + 1], t[2 * v + 2]);
+}
+
+int get(int v, int l, int r, int ql, int qr) {
+    if (qr <= l || r <= ql) return 0;
+    if (ql <= l && r <= qr) return t[v];
+    int mid = (l + r) >> 1;
+    return std::max(get(2 * v + 1, l, mid, ql, qr), get(2 * v + 2, mid, r, ql, qr));
+}
+
+void HLD(int v) {
+    sizee(v);
+    dfs(v, 0);
+    tin(v);
+    search_head(v, v);
+}
+
+int up(int u, int v) {
+    int ans = 0;
+    while (head[u] != head[v]) {
+        int lca_u = head[u], lca_v = head[v];
+        if (dist[lca_u] > dist[lca_v]) {
+            ans = std::max(ans, get(0, 1, n + 1, t_in[lca_u], t_in[u] + 1));
+            u = parent[lca_u];
+        } else {
+            ans = std::max(ans, get(0, 1, n + 1, t_in[lca_v], t_in[v] + 1));
+            v = parent[lca_v];
+        }
+    }
+    if (dist[u] > dist[v]) ans = std::max(ans, get(0, 1, n + 1, t_in[v], t_in[u] + 1));
+    else ans = std::max(ans, get(0, 1, n + 1, t_in[u], t_in[v] + 1));
+    return ans;
+}
+
+signed main() {
+    std::cin.tie(0)->sync_with_stdio(0);
+    // something else ...
+    return 0;
+}
