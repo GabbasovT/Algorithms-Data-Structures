@@ -1,0 +1,29 @@
+const long long mod = 1e9 + 7;
+
+std::vector<std::vector<long long>> multi(std::vector<std::vector<long long>> fi, std::vector<std::vector<long long>> se) {
+  int n = (int)fi[0].size();
+  int m = (int)fi.size(), k = (int)se[0].size(); 
+  std::vector<std::vector<long long>> res(m, std::vector<long long>(k, 0));
+  for (int i = 0; i < m; ++i) {
+    for (int j = 0; j < k; ++j) {
+      for (int it = 0; it < n; ++it) res[i][j] = (res[i][j] + fi[i][it] * se[it][j]) % mod;
+    }
+  }
+  return res;
+}
+
+std::vector<std::vector<long long>> binMatrix(std::vector<std::vector<long long>> matr, long long pow) {
+  std::vector<std::vector<long long>> res = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}};
+  while (pow) {
+    if (pow & 1) res = multi(matr, res);
+    matr = multi(matr, matr);
+    pow >>= 1;
+  }
+  return res;
+}
+
+signed main() {
+    std::cin.tie(0)->sync_with_stdio(0);
+    // something else ...
+    return 0;
+}
