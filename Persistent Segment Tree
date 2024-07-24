@@ -4,8 +4,8 @@ struct Node {
   long long val;
   Node * l, * r;
   Node() { l = r = nullptr; }
-  Node(long long val) : val(val) {}
-  Node(Node * l, Node *r) : l(l), r(r) {}
+  Node(long long x) : val(x) {}
+  Node(Node * _l, Node * _r) : l(_l), r(_r) {}
 };
 
 std::vector<Node *> pers;
