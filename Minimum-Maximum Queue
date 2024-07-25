@@ -1,0 +1,57 @@
+const long long inf = 1e18;
+
+template <typename T>
+struct Stack {
+    std::stack<std::pair<T, T>> Min, Max;
+    Stack() {}
+    void add(T x) {
+        if (Min.empty()) {
+            Min.push({ x, x });
+            Max.push({ x, x });
+            return;
+        }
+        Min.push({ x, std::min(Min.top().second, x) });
+        Max.push({ x, std::max(Max.top().second, x) });
+    }
+    void del() {
+        Min.pop();
+        Max.pop();
+    }
+    std::pair<T, T> get() {
+        if (Max.empty()) return { -inf, inf };
+        return { Max.top().second, Min.top().second };
+    }
+    void clear() {
+        Min = std::stack<std::pair<T, T>>();
+        Max = std::stack<std::pair<T, T>>();
+    }
+};
+ 
+template <typename T>
+struct Queue {
+    Stack<T> s1, s2;
+    Queue() {}
+    void add(T x) { s1.add(x); }
+    void swp() {
+        while (!s1.Min.empty()) {
+            s2.add(s1.Max.top().first);
+            s1.del();
+        }
+    }
+    void del() {
+        if (s2.Max.empty()) swp();
+        s2.del();
+    }
+    std::pair<T, T> get() {
+        std::pair<T, T> cur1 = s1.get();
+        std::pair<T, T> cur2 = s2.get();
+        return { std::max(cur1.first, cur2.first), std::min(cur1.second,cur2.second) };
+    }
+};
+
+signed main() {
+    std::cin.tie(0)->sync_with_stdio(0);
+    Queue<long long> object;
+    // something else ...
+    return 0;
+}
