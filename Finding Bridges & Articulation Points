@@ -1,0 +1,54 @@
+const long long nmax = 1e5 + 5;
+
+bool used[nmax];
+int h[nmax], dp[nmax];
+
+inline void initialize(int size = nmax) {
+    std::fill(used, used + size, false);
+    std::fill(h, h + size, 0);
+    std::fill(dp, dp + size, 0);
+}
+
+std::vector<int> g[nmax];
+std::vector<std::pair<int, int>> bridges;
+std::vector<int> articulationPoints;
+
+void findingBridges(int vertex, int parent = -1) {
+    used[vertex] = true;
+    dp[vertex] = h[vertex] = (parent == -1 ? 0 : h[parent] + 1);
+    for (auto u : g[vertex]) {
+        if (u != parent) {
+            if (used[u]) dp[vertex] = std::min(dp[vertex], h[u]);
+            else {
+                findingBridges(u, vertex);
+                dp[vertex] = std::min(dp[vertex], dp[u]);
+                if (h[vertex] < dp[u]) bridges.emplace_back(vertex, u);
+            }
+        }
+    }
+}
+
+void findingAPoints(int vertex, int parent) {
+    used[vertex] = true;
+    dp[vertex] = h[vertex] = (parent == -1 ? 0 : h[parent] + 1);
+    int countSubTrees = 0;
+    for (auto u : g[vertex]) {
+        if (u != parent) {
+            if (used[u]) dp[vertex] = std::min(dp[vertex], h[u]);
+            else {
+                findingAPoints(u, vertex);
+                dp[vertex] = std::min(dp[vertex], dp[u]);
+                if (h[vertex] <= dp[u] && parent != -1) articulationPoints.push_back(vertex);
+                countSubTrees++;
+            }
+        }
+    }
+    if (parent == -1 && countSubTrees > 1) articulationPoints.push_back(vertex);
+}
+
+signed main() {
+    std::cin.tie(0)->sync_with_stdio(0);
+    initialize();
+    // something else ...
+    return 0;
+}
