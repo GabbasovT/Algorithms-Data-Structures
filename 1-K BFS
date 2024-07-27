@@ -1,0 +1,36 @@
+const long long nmax = 1e5 + 5;
+const long long K = 10;
+const long long inf = 1e18;
+
+std::vector<std::pair<long long, long long>> g[nmax];
+std::queue<long long> Q[K];
+std::vector<bool> used(nmax, false);
+
+std::vector<long long> BFS(long long start, long long n) {
+    std::vector<long long> dist(n, inf);
+    dist[start] = 0;
+    Q[0].push(start);
+    long long count = 1, pos = 0;
+    while (count) {
+        while (Q[pos % K].empty()) pos++;
+        long long vertex = Q[pos % K].front();
+        Q[pos % K].pop();
+        count--;
+        if (used[vertex]) continue;
+        used[vertex] = true;
+        for (auto [u, w] : g[vertex]) {
+            if (dist[vertex] + w < dist[u]) {
+                dist[u] = dist[vertex] + w;
+                count++;
+                Q[dist[u] % K].push(u);
+            }
+        }
+    }
+    return dist;
+}
+
+signed main() {
+    std::cin.tie(0)->sync_with_stdio(0);
+    // something else ...
+    return 0;
+}
