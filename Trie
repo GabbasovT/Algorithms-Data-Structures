@@ -1,0 +1,49 @@
+const long long nmax = 1e5 + 5;
+const long long Nan = -1;
+
+struct trie {
+    int term, cnt;
+    trie() { term = cnt = 0; }
+};
+
+int total = 1;
+std::vector<std::vector<int>> g(nmax, std::vector<int>(26, Nan));
+trie arr[nmax];
+
+int makeGo(int cur, char c) {
+    if (g[cur][c - 'a'] != Nan) {
+        arr[g[cur][c - 'a']].cnt++;
+        return g[cur][c - 'a'];
+    }
+    g[cur][c - 'a'] = total++;
+    arr[g[cur][c - 'a']].cnt++;
+    return g[cur][c - 'a'];
+}
+
+void add(std::string & s) {
+    int cur = 0;
+    for (auto u : s) cur = makeGo(cur, u);
+    arr[cur].term++;
+}
+
+void kth(int k, int v, std::string & s) {
+    if (arr[v].term >= k) return;
+    k -= arr[v].term;
+    for (int i = 0; i < 26; ++i) {
+        if (g[v][i] != Nan) {
+            if (arr[g[v][i]].cnt >= k) {
+                s += char(i + 'a');
+                kth(k, g[v][i], s);
+                return;
+            } else {
+                k -= arr[g[v][i]].cnt;
+            }
+        }
+    }
+}
+
+signed main() {
+    std::cin.tie(0)->sync_with_stdio(0);
+    // something else ...
+    return 0;
+}
