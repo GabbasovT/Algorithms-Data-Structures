@@ -1,0 +1,24 @@
+const long long nmax = 1e3 + 3;
+
+std::vector<long long> g[nmax], mt(nmax, -1), used(nmax, 0);
+long long timer = 1;
+
+void dfs(long long vertex) {
+    if (used[vertex] == timer) return;
+    used[vertex] = timer;
+    for (auto u : g[v]) {
+        if (mt[u] == -1 || dfs(mt[u])) {
+            mt[u] = vertex;
+            return;
+        }
+    }
+}
+
+signed main() {
+    std::cin.tie(0)->sync_with_stdio(0);
+    for (long long vertex = 0; vertex < nmax; ++vertex, ++timer) {
+        if (used[vertex] != timer) dfs(vertex);
+    }
+    // something else ...
+    return 0;
+}
