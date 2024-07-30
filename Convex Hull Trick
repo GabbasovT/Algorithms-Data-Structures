@@ -1,0 +1,39 @@
+struct Line {
+    long long k, b;
+    Line() {}
+    Line(long long k, long long b) : k(k), b(b) {}
+    long long f(long long x) {
+        return k * x + b;
+    }
+};
+ 
+std::vector<Line> lines;
+std::vector<long long> pts;
+ 
+double cross(const Line & a, const Line & b) {
+    return (b.b - a.b) / (1.0 * (a.k - b.k));
+}
+ 
+void add(const Line & x) {
+    if (lines.empty()) {
+        lines.push_back(x);
+        pts.push_back(-1e18);
+        return;
+    }
+    while (cross(lines.back(), x) <= pts.back()) {
+        pts.pop_back();
+        lines.pop_back();
+    }
+    pts.push_back(cross(x, lines.back()));
+    lines.push_back(x);
+}
+ 
+long long query(long long x) {
+    return lines[(upper_bound(pts.begin(), pts.end(), x) - pts.begin() - 1)].f(x);
+}
+
+signed main() {
+    std::cin.tie(0)->sync_with_stdio(0);
+    // something else ...
+    return 0;
+}
