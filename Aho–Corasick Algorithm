@@ -1,0 +1,101 @@
+const int L = 26;
+const int NaN = -1;
+const int N = 1e6;
+int total = 1;
+bool term[N];
+int to[N][L];
+int go[N][L];
+int suf[N];
+int sup[N];
+int res[N];
+int pr[N];
+int in[N];
+int ind = 0;
+int string_index[N];
+bool meet[N];
+
+int ch(char c) {
+    return c - 'a';
+}
+
+void add(std::string s) {
+    int u = 0;
+    for (char c : s) {
+        if (to[u][ch(c)] == NaN) {
+            to[u][ch(c)] = total++;
+            pr[to[u][ch(c)]] = u;
+            in[to[u][ch(c)]] = ch(c);
+        }
+        u = to[u][ch(c)];
+    }
+    term[u] = true;
+    string_index[u] = ind++;
+}
+
+bool contains(std::string s) {
+    int u = 0;
+    for (char c : s) {
+        if (to[u][ch(c)] == NaN) return false;
+        u = to[u][ch(c)];
+    }
+    return term[u];
+}
+
+int getGo(int u, int c);
+
+int getSuf(int u) {
+    if (suf[u] != NaN) return suf[u];
+    if (u == 0) return suf[u] = 0;
+    if (pr[u] == 0) return suf[u] = 0;
+    return suf[u] = getGo(getSuf(pr[u]), in[u]);
+}
+
+int getGo(int u, int c) {
+    if (go[u][c] != NaN) return go[u][c];
+    if (to[u][c] != NaN) return go[u][c] = to[u][c];
+    if (u == 0) return go[u][c] = 0;
+    return go[u][c] = getGo(getSuf(u), c);
+}
+
+int getSup(int u) {
+    if (sup[u] != NaN) return sup[u];
+    if (u == 0) return sup[u] = 0;
+    int v = getSuf(u);
+    if (term[v]) return sup[u] = v;
+    return sup[u] = getSup(v);
+}
+int getRes(int u) {
+    if (res[u] != NaN) return res[u];
+    if (u == 0) return 0;
+    meet[string_index[u]] = true;
+    return res[u] = term[u] + getRes(getSup(u));
+}
+
+int check(std::string str) {
+    int u = 0, ans = 0;
+    for (char t : str) {
+        u = getGo(u, ch(t));
+        ans += getRes(u);
+    }
+    return ans;
+}
+
+void prepare() {
+    std::fill(term, term + N, false);
+    for (int i = 0; i < N; ++i) std::fill(to[i], to[i] + L, NaN);
+    std::fill(pr, pr+N, NaN);
+    std::fill(in, in+N, NaN);
+    std::fill(suf, suf + N, NaN);
+    std::fill(sup, sup+N, NaN);
+    std::fill(res, res+N, NaN);
+    std::fill(meet, meet+N, false);
+    std::fill(string_index, string_index+N, NaN);
+    for (int i = 0; i < N; ++i) std::fill(go[i], go[i] + L, NaN);
+}
+
+signed main() {
+    std::cin.tie(0)->sync_with_stdio(0);
+    prepare();
+    // something else ...
+    return 0;
+}
