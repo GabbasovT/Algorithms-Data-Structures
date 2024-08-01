@@ -1,0 +1,101 @@
+#include <bits/stdc++.h>
+#pragma GCC target("avx2,sse2")
+#pragma GCC optimize("O3,unroll-loops")
+
+const int nmax = 1e5 + 5;
+
+std::vector<int> g[2][nmax], c[2];
+std::map<std::vector<int>, int> id;
+std::unordered_map<int, int> names, names2;
+long long n, timer = 1, sz[2][nmax];
+
+void countingSizes(int v, int in, int p = -1) {
+    sz[in][v] = 1;
+    for (auto u : g[in][v]) {
+        if (u != p) {
+            countingSizes(u, in, v);
+            sz[in][v] += sz[in][u];
+        }
+    }
+}
+
+void Centroids(int v, int in, int p = -1) {
+    bool ok = 1;
+    for (auto u : g[in][v]) {
+        if (u != p) {
+            if (2 * sz[in][u] == n) c[in].push_back(v);
+            if (2 * sz[in][u] >= n) {
+            ok = 0;
+            Centroids(u, in, v);
+        }
+        }
+    }
+    if (ok) c[in].push_back(v);
+}
+
+void searchCentroids() {
+    for (int i = 0; i < 2; ++i) {
+        countingSizes(1, i);
+        Centroids(1, i);
+    }
+}
+
+void dfs(int v, int p = -1) {
+    if (g[0][v].size() == 1) {
+        names[v] = 0;
+        return;
+    }
+    std::vector<int> hash = {0};
+    for (auto u : g[0][v]) {
+        if (u == p) continue;
+        else {
+            dfs(u, v);
+            hash.push_back(names[u]);
+        }
+    }
+    std::sort(hash.begin(), hash.end());
+    if (id.find(hash) == id.end()) id[hash] = timer++;
+    names[v] = id[hash];
+}
+
+bool dfs2(int v, int p = -1) {
+    if (g[1][v].size() == 1) {
+        names2[v] = 0;
+        return true;
+    }
+    bool ok = true;
+    std::vector<int> hash = {0};
+    for (auto u : g[1][v]) {
+        if (u == p) continue;
+        else {
+            ok &= dfs2(u, v);
+            hash.push_back(names2[u]);
+        }
+    }
+    std::sort(hash.begin(), hash.end());
+    if (id.find(hash) == id.end()) return false;
+    names2[v] = id[hash];
+    return ok;
+}
+
+bool isomorphismChecks() {
+    searchCentroids();
+    for (auto fi : c[0]) {
+        for (auto se : c[1]) {
+            id[{0}] = 0;
+            dfs(fi);
+            if (dfs2(se)) return true;
+        }
+        timer = 1;
+        names.clear();
+        id.clear();
+    }
+    return false;
+}
+
+signed main() {
+    std::cin.tie(0)->sync_with_stdio(0);
+    isomorphismChecks();
+    // something else ...
+    return 0;
+}
