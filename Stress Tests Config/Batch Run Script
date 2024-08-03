@@ -1,0 +1,5 @@
+@echo off
+set /p programName=Write the name of the program:
+set /p inputData=Write the name of the file from where you need to read:
+.\%programName% 0< %inputData% 1> output.txt
+pause
