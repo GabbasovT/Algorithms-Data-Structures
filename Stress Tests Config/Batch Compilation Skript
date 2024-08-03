@@ -1,0 +1,6 @@
+@echo off
+set /p fileName=Write the name of the file that needs to be compiled:
+set /p programName=Write the name of the program:
+g++ %fileName% -Wall -Wextra -Werror -Wshadow -std=c++20 -o %programName% 2> errors.txt
+echo Compilation started... 
+pause
